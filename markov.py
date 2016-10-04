@@ -38,10 +38,15 @@ def make_chains(text_string):
 
         key = (words[key_item1], words[key_item2])
 
-        if key in chains:
-            chains[key].append(words[value_item])
-        else:
-            chains[key] = [words[value_item]]
+        if key not in chains:
+            chains[key] = []
+
+        chains[key].append(words[value_item])
+        
+        # if key in chains:
+        #     chains[key].append(words[value_item])
+        # else:
+        #     chains[key] = [words[value_item]]
         
         key_item1 += 1
         key_item2 += 1
@@ -53,33 +58,31 @@ def make_chains(text_string):
 
 def make_text(chains):
     """Takes dictionary of markov chains; returns random text."""
-
-    text = ""
-    # 1. Pick a random key from our dictionary
+# 1. Pick a random key from our dictionary
     # 2. Put randomly generated key into our string
     # 3. Select at random a word from our values list thats associated with our key 
     # 4. Add that word to the string
     # 5. Shift frame to new key set which is second word from previous key + new word from value list
     # 6. Start over from step2
-
-
-    #  While key in dictionary:
-
+    
+    text = ""
+    
     current_key = choice(chains.keys())
-    print current_key
-    value = choice(chains[current_key])
 
     for word in current_key:
         text += word + " "
-    text += value + " "
+        
+    while current_key in chains:
+        value = choice(chains[current_key])
 
-    new_key = (current_key[1], value)
+        text += value + " "
 
-    print new_key
+        current_key = (current_key[1], value)
+
     return text
 
 
-input_path = "green-eggs.txt"
+input_path = "gettysburg.txt"
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
@@ -90,4 +93,4 @@ chains = make_chains(input_text)
 # Produce random text
 random_text = make_text(chains)
 
-# print random_text
+print random_text
