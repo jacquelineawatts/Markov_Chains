@@ -2,14 +2,14 @@ from random import choice
 
 from sys import argv
 
-def open_and_read_file(file_path):
+def open_and_read_file(file_path1, file_path2):
     """Takes file path as string; returns text as string.
 
     Takes a string that is a file path, opens the file, and turns
     the file's contents as one string of text.
     """
 
-    file_text = open(file_path).read()
+    file_text = open(file_path1).read() + open(file_path2).read()
 
     return file_text
 
@@ -59,53 +59,76 @@ def make_chains(text_string):
     return chains
 
 
-def make_text(chains):
-    """Takes dictionary of markov chains; returns random text."""
-# 1. Pick a random key from our dictionary
-    # 2. Put randomly generated key into our string
-    # 3. Select at random a word from our values list thats associated with our key 
-    # 4. Add that word to the string
-    # 5. Shift frame to new key set which is second word from previous key + new word from value list
-    # 6. Start over from step2
-    
-    text = ""
-
+def find_upper_case(chains):
+    """Takes chains dictionary and finds all instances where first letter of the 0th index of a key is upper case."""
 
     upper_case_keys = []
     for key in chains: 
         if key[0][0].isupper():
             upper_case_keys.append(key)
 
+    return upper_case_keys
+
+
+def find_punctuated_keys(chains):
+    """Takes chains dictionary and finds all instances of punctuation on the last index of the last key element."""
+
     punctuated_keys = []
     for key in chains:
         if key[2][-1] in ['.', '?', '!']:
             punctuated_keys.append(key)    
 
-    current_key = choice(upper_case_keys)  
+    return punctuated_keys
+
+
+def establish_starter_key(chains):
+    """Selects random starter key from chains dictionary. """
+
+    return choice(find_upper_case(chains))  
+
+
+def make_text(chains):
+    """Takes dictionary of markov chains; returns random text."""
+    # 1. Pick a random key from our dictionary
+    # 2. Put randomly generated key into our string
+    # 3. Select at random a word from our values list thats associated with our key 
+    # 4. Add that word to the string
+    # 5. Shift frame to new key set which is second word from previous key + new word from value list
+    # 6. Start over from step2
+    
+    # Punctuation:
+    # 1. Have huge text string
+    # 2. Start filtering through from the back, begin from -1 index, moving backwards by 1
+    # 3. Compare to various end characters (?, ., !)
+    # 4. If it is not one of those characters, delete
+    # 5. If it is, break and return our text
+
+    text = ""
+
+    current_key = establish_starter_key(chains)
     for word in current_key:
         text += word + " "
-        
-    for current_key in chains: 
-        while len(text) < 500:
-            value = choice(chains[current_key])
-            text += value + " "
-            current_key = (current_key[1], current_key[2], value)
 
-        else:
-            if current_key in punctuated_keys:
+    while len(text) < 1000:
+        value = choice(chains[current_key])
+        text += value + " "
+        current_key = (current_key[1], current_key[2], value)
+    # print current_key
+
+    if current_key not in find_punctuated_keys(chains):
+        for index in range(len(text) -1, 0, -1):
+            if text[index] in [".", "!", "?"]:
                 break
-            # else:
-            #     value = choice(chains[current_key])
-            #     text += value + " "
-
-
+            else:
+                text = text[:index]
+           
     return text
 
 
-input_path = argv[1]
+input_path1, input_path2 = argv[1], argv[2]
 
 # Open the file and turn it into one long string
-input_text = open_and_read_file(input_path)
+input_text = open_and_read_file(input_path1, input_path2)
 
 # Get a Markov chain
 chains = make_chains(input_text)
