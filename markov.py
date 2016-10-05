@@ -69,18 +69,35 @@ def make_text(chains):
     # 6. Start over from step2
     
     text = ""
-    
-    current_key = choice(chains.keys())
 
+
+    upper_case_keys = []
+    for key in chains: 
+        if key[0][0].isupper():
+            upper_case_keys.append(key)
+
+    punctuated_keys = []
+    for key in chains:
+        if key[2][-1] in ['.', '?', '!']:
+            punctuated_keys.append(key)    
+
+    current_key = choice(upper_case_keys)  
     for word in current_key:
         text += word + " "
         
-    while current_key in chains:
-        value = choice(chains[current_key])
+    for current_key in chains: 
+        while len(text) < 500:
+            value = choice(chains[current_key])
+            text += value + " "
+            current_key = (current_key[1], current_key[2], value)
 
-        text += value + " "
+        else:
+            if current_key in punctuated_keys:
+                break
+            # else:
+            #     value = choice(chains[current_key])
+            #     text += value + " "
 
-        current_key = (current_key[1], current_key[2], value)
 
     return text
 
