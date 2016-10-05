@@ -1,5 +1,6 @@
 from random import choice
 
+from sys import argv
 
 def open_and_read_file(file_path):
     """Takes file path as string; returns text as string.
@@ -32,17 +33,18 @@ def make_chains(text_string):
 
     key_item1 = 0
     key_item2 = 1
-    value_item = 2
+    key_item3 = 2
+    value_item = 3
 
-    while key_item2 < (len(words) - 1):
+    while key_item3 < (len(words) - 1):
 
-        key = (words[key_item1], words[key_item2])
+        key = (words[key_item1], words[key_item2], words[key_item3])
 
         if key not in chains:
             chains[key] = []
 
         chains[key].append(words[value_item])
-        
+
         # if key in chains:
         #     chains[key].append(words[value_item])
         # else:
@@ -50,6 +52,7 @@ def make_chains(text_string):
         
         key_item1 += 1
         key_item2 += 1
+        key_item3 += 1
         value_item += 1
 
 
@@ -77,12 +80,12 @@ def make_text(chains):
 
         text += value + " "
 
-        current_key = (current_key[1], value)
+        current_key = (current_key[1], current_key[2], value)
 
     return text
 
 
-input_path = "gettysburg.txt"
+input_path = argv[1]
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
