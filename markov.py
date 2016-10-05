@@ -2,14 +2,17 @@ from random import choice
 
 from sys import argv
 
-def open_and_read_file(file_path1, file_path2):
+def open_and_read_file(first_text, *argv):
     """Takes file path as string; returns text as string.
 
     Takes a string that is a file path, opens the file, and turns
     the file's contents as one string of text.
     """
 
-    file_text = open(file_path1).read() + open(file_path2).read()
+    file_text = open(first_text).read()
+
+    for arg in argv:
+        file_text += open(arg).read()
 
     return file_text
 
@@ -105,16 +108,19 @@ def make_text(chains):
 
     text = ""
 
+    # Grabs a random starter key and adds it to text string
     current_key = establish_starter_key(chains)
     for word in current_key:
         text += word + " "
 
+    # Runs loop to: 1)Grab random value, append to text string, and reassign new key
+    # Limits text string to 1000 char 
     while len(text) < 1000:
         value = choice(chains[current_key])
         text += value + " "
         current_key = (current_key[1], current_key[2], value)
-    # print current_key
 
+    # Ensures that text string will end in punctuation
     if current_key not in find_punctuated_keys(chains):
         for index in range(len(text) -1, 0, -1):
             if text[index] in [".", "!", "?"]:
@@ -125,10 +131,10 @@ def make_text(chains):
     return text
 
 
-input_path1, input_path2 = argv[1], argv[2]
+input_path = argv[1:]
 
 # Open the file and turn it into one long string
-input_text = open_and_read_file(input_path1, input_path2)
+input_text = open_and_read_file(input_path[0], *argv)
 
 # Get a Markov chain
 chains = make_chains(input_text)
